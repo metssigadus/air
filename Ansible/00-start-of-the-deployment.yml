@@ -1,0 +1,58 @@
+---
+# Ansible playbook for a SDRPlay+OpenWebRx listening post
+# part 00 - instatiate a deploy user on top of a low footprint Debian installation
+#
+# (origin and copyleft) - es1lau
+# last modified - 2019-07-27
+# version? probably 0.7 or something
+#
+- hosts: i
+  tasks:
+#
+# - command line to launch: XXXXXXXXXXXXXXXXXXXXXXXXXXx
+#
+    - ping: ~
+    - name: Creating the group for the deploy user
+      become: true
+      become_user: root
+      become_method: su
+      group:
+        name: shaitan
+        gid: 666
+        state: present
+    - name: Creating the deploy user itself
+      user:
+        name: shaitan
+        uid: 666
+        groups: shaitan,sudo
+        shell: /bin/bash
+        append: yes
+        createhome: yes
+        comment: 'Deployment user for ansible'
+        state: present
+    - name: Make directory for the SSH public key
+      file:
+        path: "/home/shaitan/.ssh"
+        state: directory
+        owner: shaitan
+        group: shaitan
+        mode: 0700
+    - name: Create an empty keyfile
+      file:
+        path: "/home/shaitan/.ssh/authorized_keys"
+        state: touch
+
+# Well, I already had the keys generated. Otherwise do so:
+#
+
+    - name: Overwrite it with the SSH public key
+# I overwrite the file b/c I know for sure - no other keys there ever.
+# Warning, the proper script should add it to the keyfile, not to overwrite as this
+#
+      copy:
+        src: "./ssh/airsoap-key-ecdsa521.pub"
+        dest: "~shaitan/.ssh/authorized_keys"
+        owner: shaitan
+        group: shaitan
+        mode: 0600
+...

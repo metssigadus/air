@@ -1,0 +1,61 @@
+---
+# Ansible playbook for a SDRPlay+OpenWebRx listening post
+# part 09 - clone a bunch of git packages from the pothosware suite
+#
+# (origin and copyleft) - es1lau
+# last modified - 2019-07-27
+# version? probably 0.7 or something
+#
+- hosts: hamradio
+  vars:
+    git_basedir: "/home/shaitan/GIT/"
+  tasks:
+
+  - name: 1/8 - checkout SoapySDR from github
+    git:
+      repo: 'https://github.com/pothosware/SoapySDR.git'
+      dest: "{{ git_basedir }}/SoapySDR"
+      clone: yes
+
+  - name: 2/8 - checkout SoapySDRPlay from github
+    git:
+      repo: 'https://github.com/pothosware/SoapySDRPlay.git'
+      dest: "{{ git_basedir }}/SoapySDRPlay"
+      clone: yes
+
+  - name: 3/8 - checkout SoapyRemote from github
+    git:
+      repo: 'https://github.com/pothosware/SoapyRemote.git'
+      dest: "{{ git_basedir }}/SoapyRemote"
+      clone: yes
+
+  - name: 4/8 - checkout rx_tools from github
+    git:
+      repo: 'https://github.com/rxseger/rx_tools.git'
+      dest: "{{ git_basedir }}/rx_tools"
+      clone: yes
+
+  - name: 5/8 - checkout rtl-sdr from github
+    git:
+      repo: 'https://github.com/keenerd/rtl-sdr.git'
+      dest: "{{ git_basedir }}/rtl-sdr"
+      clone: yes
+
+  - name: 6/8 - checkout SoapyRTLSDR from github
+    git:
+      repo: 'https://github.com/pothosware/SoapyRTLSDR.git'
+      dest: "{{ git_basedir }}/SoapyRTLSDR"
+      clone: yes
+
+  - name: 7/8 - checkout csdr from github
+    git:
+      repo: 'https://github.com/simonyiszk/csdr.git'
+      dest: "{{ git_basedir }}/csdr"
+      clone: yes
+
+  - name: 8/8 - checkout OpenWebRX from github
+    git:
+      repo: 'https://github.com/simonyiszk/openwebrx.git'
+      dest: "{{ git_basedir }}/OpenWebRX"
+      clone: yes
+...

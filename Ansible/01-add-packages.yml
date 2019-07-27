@@ -1,0 +1,26 @@
+---
+# Ansible playbook for a SDRPlay+OpenWebRx listening post
+# part 01 - install some generic packages our setup will need
+#
+# (origin and copyleft) - es1lau
+# last modified - 2019-07-27
+# version? probably 0.7 or something
+#
+- hosts: hamradio
+  tasks:
+  - name: apt install mc / lynx / iotop / htop / sudo / aptitude
+    become: true
+    become_method: su
+    become_user: root
+    apt:
+      name: "{{ item }}"
+      update_cache: true
+      state: present
+    with_items:
+      - 'mc' # a convenience thing, my environment preference
+      - 'lynx' # a convenience thing, my environment preference
+      - 'iotop'# a convenience thing, my environment preference
+      - 'htop' # a convenience thing, my environment preference
+      - 'sudo' # the SDRplay API installation insists on it
+      - 'aptitude' # b/c update cache is not otherwise possible
+...

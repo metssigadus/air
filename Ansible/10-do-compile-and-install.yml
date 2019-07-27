@@ -1,0 +1,172 @@
+---
+# Ansible playbook for a SDRPlay+OpenWebRx listening post
+# part 10 - configure, compile and install the packages
+# in a proper order (there are weird dependendies) 
+#
+# (origin and copyleft) - es1lau
+# last modified - 2019-07-27
+# version? probably 0.7 or something
+#
+- hosts: hamradio
+  vars:
+    git_basedir: "/home/shaitan/GIT/"
+  tasks:
+#
+# ToDo: output status neither checked nor created yet
+#
+# -- STEP 1
+  - name: provisioning 6 x build directories
+    file:
+      path: "{{ git_basedir }}/{{ item }}/build"
+      state: directory
+    with_items:
+      - 'SoapySDR'
+      - 'SoapySDRPlay'
+      - 'SoapyRemote'
+      - 'rx_tools'
+      - 'rtl-sdr'
+      - 'SoapyRTLSDR'
+
+#
+# -- STEP 2
+# SoapySDR is the first item and others are depending on it:
+  - name: cmake package -> SoapySDR (1/8)
+    command: cmake ..
+    args:
+      chdir: "{{ git_basedir }}/{{ item }}/build/"
+      creates: "{{ git_basedir }}/{{ item }}/build/CMakeCache.txt"
+    with_items:
+      - 'SoapySDR'
+
+  - name: make package -> SoapySDR
+    command: make
+    args:
+      chdir: "{{ git_basedir }}/{{ item }}/build/"
+      creates: "{{ git_basedir }}/{{ item }}/build/apps/SoapySDRUtil"
+    with_items:
+      - 'SoapySDR'
+
+  - name: make install package -> SoapySDR
+    become: true
+    become_method: su
+    become_user: root
+    command: 'make install'
+    args:
+      chdir: "{{ git_basedir }}/{{ item }}/build/"
+#      creates: "/usr/local/bin/SoapySDRUtil"
+    with_items:
+      - 'SoapySDR'
+
+  - name: ldconfig
+    become: true
+    become_method: su
+    become_user: root
+    command: /usr/sbin/ldconfig
+
+
+# -- STEP 3->  Next 4 items in that particular order
+
+# Hetkeprobleem - SoapySDRPlay ei installeeru kuni ei leia mingeid krdi faile
+# "CMake Error at CMakeLists.txt:16 (message):\n  SDRPlay development files not found..."
+
+  - name: cmake -> SoapySDRPlay, SoapyRemote, rx_tools, rtl-sdr (2-5/8)
+    command: cmake ..
+    args:
+      chdir: "{{ git_basedir }}/{{ item }}/build"
+      creates: "{{ git_basedir }}/{{ item }}/build/CMakeCache.txt"
+    with_items:
+      - 'SoapySDRPlay'
+      - 'SoapyRemote'
+      - 'rx_tools'
+      - 'rtl-sdr'
+
+  - name: make -> SoapySDRPlay, SoapyRemote, rx_tools, rtl-sdr (2-5/8)
+    command: make
+    args:
+      chdir: "{{ git_basedir }}/{{ item }}/build"
+#      creates: "{{ git_basedir }}/{{ item }}/build/apps/SoapySDRUtil"
+    with_items:
+      - 'SoapySDRPlay'
+      - 'SoapyRemote'
+      - 'rx_tools'
+      - 'rtl-sdr'
+
+  - name: make install -> SoapySDRPlay, SoapyRemote, rx_tools, rtl-sdr (2-5/8)
+    become: true
+    become_method: su
+    become_user: root
+    command: make install
+    args:
+      chdir: "{{ git_basedir }}/{{ item }}/build"
+#      creates: "/usr/local/bin/SoapySDRUtil"
+    with_items:
+      - 'SoapySDRPlay'
+      - 'SoapyRemote'
+      - 'rx_tools'
+      - 'rtl-sdr'
+
+  - name: ldconfig
+    become: true
+    become_method: su
+    become_user: root
+    command: /usr/sbin/ldconfig
+
+# -- STEP 4 -> SoapyRTLSDR that needs targets 1 & 5 already being installed
+
+  - name: cmake -> SoapyRTLSDR (6/8)
+    command: cmake ..
+    args:
+      chdir: "{{ git_basedir }}/{{ item }}/build"
+      creates: "{{ git_basedir }}/{{ item }}/build/CMakeCache.txt"
+    with_items:
+      - 'SoapyRTLSDR'
+
+  - name: make -> SoapyRTLSDR (6/8)
+    command: make
+    args:
+      chdir: "{{ git_basedir }}/{{ item }}/build"
+#      creates: "{{ git_basedir }}/{{ item }}/build/apps/SoapySDRUtil"
+    with_items:
+      - 'SoapyRTLSDR'
+
+  - name: make install -> SoapyRTLSDR (6/8)
+    become: true
+    become_method: su
+    become_user: root
+    command: make install
+    args:
+      chdir: "{{ git_basedir }}/{{ item }}/build"
+#      creates: "/usr/local/bin/SoapySDRUtil"
+    with_items:
+      - 'SoapyRTLSDR'
+
+  - name: ldconfig
+    become: true
+    become_method: su
+    become_user: root
+    command: /usr/sbin/ldconfig
+
+# -- STEP 5 -> csdr that requires nothing but is just too simple
+
+
+#
+#
+#  - name: 1-A /8 - compile SoapySDR
+#    command: :
+#      directory: "{{ git_basedir }}/SoapySDR"
+#      clone: yes
+#
+#
+# for each do:
+#
+# cd <target_directory>
+# mkdir build
+# cd build
+# cmake ..
+# make
+#
+# for each do:
+# BECOME
+# cd <target_directory>
+# sudo make install # [Remember, from another (sudo capable) account!]
+# sudo ldconfig

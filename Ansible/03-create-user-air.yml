@@ -1,0 +1,36 @@
+---
+# Ansible playbook for a SDRPlay+OpenWebRx listening post
+# part 03 - install the user running OpenWebRx
+#
+# (origin and copyleft) - es1lau
+# last modified - 2019-07-27
+# version? probably 0.7 or something
+#
+- hosts: hamradio
+  tasks:
+  - name: add group air
+    become: true
+    become_method: su
+    become_user: root
+    group:
+      name: air
+      gid: 1111
+      state: present
+  - name: Create user air
+    become: true
+    become_method: su
+    become_user: root
+    user:
+      name: air
+      uid: 1111
+      password: '$6$LPvswqsqm7oEm$aX1fUNUKP8rtark80mfyz2.bLuo31bqqJx7rBMVWwJrdGr5Rjdsj/EG3TSwTOApKKZ2tHbKrPPuihFy9ih/Ju1'
+# mkpasswd --method=sha-512 <-- uugametsaK0lla
+# No, I do not use this particular passwd on the real installation.
+      group: air
+      groups: users   # Empty by default.
+      shell: /bin/bash       # Defaults to /bin/bash
+      system: no             # Defaults to no
+      createhome: yes        # Defaults to yes
+      home: /home/air  # Defaults to /home/<username>
+      state: present
+...

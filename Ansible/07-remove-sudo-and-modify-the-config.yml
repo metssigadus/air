@@ -1,0 +1,21 @@
+---
+# Ansible playbook for a SDRPlay+OpenWebRx listening post
+# part 07 - manipulate su/sudo and install SDRPlay API
+#
+# (origin and copyleft) - es1lau
+# last modified - 2019-07-27
+# version? probably 0.7 or something
+#
+- hosts: hamradio
+#
+# currently assumes you will manipulate your ansible .cfg back to become_method; su
+# 
+  tasks:
+  - name: apt remove sudo # Back to non-Ubuntu world
+    become: true
+    become_method: su
+    become_user: root
+    apt:
+      name: sudo
+      state: absent # Before we continue on Debian
+...

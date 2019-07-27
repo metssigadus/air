@@ -1,0 +1,30 @@
+---
+# Ansible playbook for a SDRPlay+OpenWebRx listening post
+# part 08 - install some packages needed just for compilation
+#
+# (origin and copyleft) - es1lau
+# last modified - 2019-07-27
+# version? probably 0.7 or something
+#
+- hosts: hamradio
+  tasks:
+  - name: apt multi-install with_items - libusb / libfftw3-dev / git / cmake / build-essential / pkg-config
+    become: true
+    become_method: su
+    become_user: root
+    apt:
+      name: "{{ item }}"
+      update_cache: true
+      state: present
+    with_items:
+      - 'libusb-1.0-0-dev' # obviously
+      - 'libfftw3-dev' # Was it SoapyRTLSDR who needed it?
+      - 'git' #
+      - 'cmake' #
+      - 'build-essential' #
+      - 'pkg-config' # otherwise avahi-daemon || libavahi-client-dev will do it
+#
+# if any LC_CTYPE error -> go and manually 'sudo dpkg-reconfigure locales'
+# That's the issue with these low footprint installations.
+#
+...
