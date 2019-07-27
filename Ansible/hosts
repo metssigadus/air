@@ -1,0 +1,51 @@
+#
+# Ansible playbook for a SDRPlay+OpenWebRx listening post
+# hosts - do not use a global one at /etc/ansible/hosts
+# but maintain it in a local directory for conveniency
+#
+# (origin and copyleft) - es1lau
+# last modified - 2019-07-27
+# version? probably 0.7 or something
+#
+# throw away /etc/ansible/hosts
+# throw away /etc/ansible/ansible.config
+# create an ansible.cfg in ~/Ansible
+# symlink it to ~/.ansible.cfg
+# and ... do declare in it where is your hosts file:
+# inventory = ./hosts
+# Now playing without involving these system dirs
+
+# 2019-06-24
+[hamradio]
+air1
+air3
+test
+
+# [air1:vars]
+# ansible_user = shaitan  # ssh login user
+# become = yes
+# become_method = sudo
+# become_user = root
+# ansible_become_pass='{{ air1_sudo_pass }}'
+
+[air1]
+10.10.117.117
+
+
+# [air3:vars]
+# ansible_user = shaitan  # ssh login user
+# become_user = root
+# become_method = su
+# ansible_become=yes  # use sudo
+# ansible_become_method = su
+# ansible_become_pass='{{ air3_sudo_pass }}'
+
+[air3]
+10.10.119.119
+
+[test]
+10.10.177.177
+
+# And not, these IP's are not real.
+# Change these to your own name/IP pairs
+# Only the structure is what is worth to look at.
