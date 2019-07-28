@@ -1,0 +1,32 @@
+---
+# ########################################################
+# Ansible playbook for a SDRPlay+OpenWebRx listening post
+# part 057 - Restart for full providence
+#
+# (origin and copyleft) - es1lau
+# last modified - 2019-07-29
+# version? likely around 0.7
+# ########################################################
+#
+#   -- WARNING - not tested yet!!!!!
+#
+- hosts: air1
+  tasks:
+
+    - name: Task a reboot in +1 min
+      become: yes
+      become_method: su
+      become_user: root
+      command: 'shutdown -r +1'
+
+    - name: Wait 120 secs before confirming the rebirth
+      pause:
+        minutes: 2
+
+    - name: Checking the server is alive again
+      local_action: wait_for
+        host="air1"
+        port=22
+        delay=10
+        timeout=120
+...
