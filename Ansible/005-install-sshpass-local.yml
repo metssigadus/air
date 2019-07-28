@@ -1,0 +1,25 @@
+---
+# Ansible playbook for a SDRPlay+OpenWebRx listening post
+# part 005 - On your local Ansible host, install the sshpass package
+#
+# (origin and copyleft) - es1lau
+# last modified - 2019-07-28
+# version? likely around 0.7
+#
+# ############################################
+#
+# command line to launch --> ansible-playbook 005-install-sshpass-local.yml
+#
+- hosts: local
+  connection: local
+# a big mess with the local and remote passwords ;)
+  become: yes
+  become_method: sudo
+  become_user: root
+  tasks:
+   - name: Install sshpass
+     apt:
+       name: sshpass
+       state: installed
+       update_cache: true
+...
