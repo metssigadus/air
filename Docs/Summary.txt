@@ -61,5 +61,8 @@ Other possible difficulties?
   - Linux admin qualifications would be useful - you need to debug it if smth goes not according to the playbook.
   - Security of the internet connected machine will certainly need some serious trimming and there is no single and simple guide for the purpose.
 
+Quirks
 
-...
+Warning - USB devices sometimes manage to remain alive after a cold restart.
+Why? Due to ATX “+5 V standby” which some of the USB connectors tend to use.
+For a more divine provisioning, a separate PSU would be needed (via USB hub).
