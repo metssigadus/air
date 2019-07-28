@@ -1,15 +1,17 @@
 ---
+# ##################################################################
 # Ansible playbook for a SDRPlay+OpenWebRx listening post
-# part 02 - now when aptitude has been installed, update the packages
+# part 015 - now when aptitude has been installed, update the packages
 #
 # (origin and copyleft) - es1lau
-# last modified - 2019-07-27
-# version? probably 0.7 or something
+# last modified - 2019-07-28
+# version? likely around 0.7
+# ##################################################################
 #
 - hosts: hamradio
   tasks:
     - ping: ~
-    - name: Update APT package manager repositories cache
+    - name: Update APT cache
       become: true
       become_method: su
       become_user: root
