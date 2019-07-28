@@ -120,6 +120,26 @@
 
     - debug: msg="Mr Ansible Operator, now its time for a reboot to update the kernel behaviour"
 
+# ------- STEP 5
+
+# Now the modules BLACKLISTING part
+# that should be done by a sudo capable user.
+#
+# -------------
+# vi /etc/modprobe.d/blacklist-rtlsdr.conf
+#
+# add
+#   blacklist dvb_usb_rtl28xxu
+# to there
+#
+#
+# then vi /etc/modprobe.d/blacklist-sdrplay.conf
+#
+# and add
+#   blacklist sdr_msi3101
+#   blacklist msi001
+#   blacklist msi2500
+# to there.
 # =================================================
 
 # Instructions for understanding

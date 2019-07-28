@@ -1,0 +1,34 @@
+---
+# ########################################################
+# Ansible playbook for a SDRPlay+OpenWebRx listening post
+# part 061 - enumerate connected SDRs "locally" (at air1)
+#
+# (origin and copyleft) - es1lau
+# last modified - 2019-07-29
+# version? likely around 0.7
+# ########################################################
+#
+#   -- WARNING - not tested yet!!!!!
+#
+- hosts: air1
+  tasks:
+
+    - name: A modest task to enumerate RTL-SDR via rtl_test
+      become: yes
+      become_method: su
+      become_user: root
+      command: 'rtl_test -t'
+      register: rtls_found_locally
+#
+   - debug: msg="{{ rtls_found_locally }}"
+
+    - name: enumerate SDRs connected to the radio host
+      become: yes
+      become_method: su
+      become_user: root
+      command: 'SoapySDRUtil --find'
+      register: soapys_found_locally
+#
+   - debug: msg="{{ soapys_found_locally }}"
+...
+

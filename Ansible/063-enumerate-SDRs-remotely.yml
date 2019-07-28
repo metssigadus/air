@@ -1,0 +1,25 @@
+---
+# ########################################################
+# Ansible playbook for a SDRPlay+OpenWebRx listening post
+# part 063 - enumerate connected SDRs "remotely" (at webhost)
+#
+# (origin and copyleft) - es1lau
+# last modified - 2019-07-29
+# version? likely around 0.7
+# ########################################################
+#
+#   -- WARNING - not tested yet!!!!!
+#   .. NB! There were some prerequisites in addition to avahi
+#
+- hosts: air3
+  tasks:
+    - name: enumerate SDRs visible via Soapy channel
+      become: yes
+      become_method: su
+      become_user: root
+      command: 'SoapySDRUtil --find'
+      register: soapys_found_remotely
+#
+   - debug: msg="{{ soapys_found_remotely }}"
+...
+
