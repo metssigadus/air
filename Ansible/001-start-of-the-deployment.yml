@@ -1,0 +1,84 @@
+---
+# Ansible playbook for a SDRPlay+OpenWebRx listening post
+# part 001 - instatiate a deploy user on top of a low footprint Debian installation
+#
+# (origin and copyleft) - es1lau
+# last modified - 2019-07-27
+# version? likely around 0.7
+#
+# ############################################
+#
+# command line to launch --> ansible-playbook -u bootjuuzer -k -K 001-start-of-the-deployment.yml 
+#   substitute bootjuuzer with the name of your own deploy user
+#
+# Do not forget each time you install a host from scratch, it's ssh identity will reborn.
+# this command --> ssh-keygen -f "~/.ssh/known_hosts" -R <the_reborn_ip> may help you
+#
+- hosts: hamradio
+  tasks:
+    - ping: ~
+    - name: Preparing the group name for the deploy user
+      become: true
+      become_user: root
+      become_method: su
+      group:
+        name: shaitan
+        gid: 666
+        state: present
+    - name: Creating the deploy user itself
+      user:
+        name: shaitan
+        uid: 666
+        password: '$6$Goq03qaQtFM2aZZd$V2P1955U3B0dCWuYMJZZW2SbWH8Al3xVh.zXyYXIvhAUMpU.rEZO70VJg3o9ulmdMvpHCXNNoCQMWQ47p3tYd/'
+# mkpasswd --method=sha-512 <-- SitaMajaTaga
+# No, I do not use this particular passwd on a real installation.
+        groups: shaitan # ,sudo
+        shell: /bin/bash
+        append: yes
+        createhome: yes
+        comment: 'Deployment user for ansible'
+        state: present
+
+    - name: add shaitan to the sudoers group (Debian specific)
+      command: usermod -aG sudo shaitan
+         
+    - name: Make directory for the SSH public key
+      file:
+        path: "/home/shaitan/.ssh"
+        state: directory
+        owner: shaitan
+        group: shaitan
+        mode: 0700
+    - name: Create an empty keyfile
+      file:
+        path: "/home/shaitan/.ssh/authorized_keys"
+        state: touch
+
+# Well, I already had the keys generated. Otherwise do approximately so:
+#    ssh-keygen -t ecdsa -b 521 -f ssh/airsoap-key-ecdsa521
+# or choose whatever options you prefer in global world
+#
+#
+# I am overwriting the file b/c I know for sure - no other keys there ever.
+# Warning, the proper script should **add** it to the keyfile, not to overwrite
+#
+    - name: Overwrite it with the SSH public key
+
+      copy:
+        src: "./ssh/airsoap-key-ecdsa521.pub"
+        dest: "~shaitan/.ssh/authorized_keys"
+        owner: shaitan
+        group: shaitan
+        mode: 0600
+#
+# Important - to make using keyfile convenient, add this to your ~/.ssh/config:
+# But to avoid artefacts, better do it manually    
+#      ############## 2019-0x-0y
+#      Host           air1
+#      HostName       10.10.345.345
+#      Port           22
+#      IdentityFile   ~/.ssh/airsoap-key-ecdsa521
+#      User           shaitan
+#
+#    
+...
