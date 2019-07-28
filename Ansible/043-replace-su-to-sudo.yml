@@ -1,0 +1,39 @@
+---
+# #########################################################
+# Ansible playbook for a SDRPlay+OpenWebRx listening post
+# part 043 - manipulate su/sudo in ansible.cfg file
+#
+# (origin and copyleft) - es1lau
+# last modified - 2019-07-27
+# version? likely around 0.7
+#
+# Remember - the heresy has two sides
+#      a) sudo on Debian is a cultural nonsense
+#      b) the SDRPlay distributable is incompatible with su
+# thus config variants are to be exchanged before and after
+#   - yeah, a great sin - a self-modifying instruction
+#   - _maybe_ I shall learn to use lineinfile feature later
+# #########################################################
+# Todo - variables
+#
+- hosts: local
+  connection: local
+  become: yes
+  become_method: su
+  become_user: root
+  tasks:
+   - name: verify the value of become_method before changing it
+     command: grep become_method /home/n0ne/Ansible/ansible.cfg
+     register: become_variant
+#
+   - debug: msg="{{ become_variant.stdout }} "
+#
+   - name: Substitute the global become_method from su to sudo
+     shell: sed -i "s/^become_method = su/become_method = sudo/g" /home/n0ne/Ansible/ansible.cfg
+#
+   - name: verify what we just did
+     command: grep become_method /home/n0ne/Ansible/ansible.cfg
+     register: become_variant
+#
+   - debug: msg="{{ become_variant.stdout }} "
+...
