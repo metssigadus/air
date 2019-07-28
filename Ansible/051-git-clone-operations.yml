@@ -1,10 +1,12 @@
 ---
+# ##################################################################
 # Ansible playbook for a SDRPlay+OpenWebRx listening post
-# part 09 - clone a bunch of git packages from the pothosware suite
+# part 051 - clone a bunch of git packages from the pothosware suite
 #
 # (origin and copyleft) - es1lau
-# last modified - 2019-07-27
-# version? probably 0.7 or something
+# last modified - 2019-07-28
+# version? likely around 0.7
+# ##################################################################
 #
 - hosts: hamradio
   vars:
@@ -58,4 +60,6 @@
       repo: 'https://github.com/simonyiszk/openwebrx.git'
       dest: "{{ git_basedir }}/OpenWebRX"
       clone: yes
+3
+# we do it sequentially without items so that errors are clearly visible
 ...
