@@ -1,12 +1,13 @@
 ---
+# #############################################################
 # Ansible playbook for a SDRPlay+OpenWebRx listening post
-# part 06 - manipulate su/sodo and install SDRPlay API
+# part 044 - install SDRPlay API
 #
 # (origin and copyleft) - es1lau
-# last modified - 2019-07-27
-# version? probably 0.7 or something
+# last modified - 2019-07-28
+# version? likely around 0.7
+# #############################################################
 #
-- hosts: hamradio
 #
 # BIG WARNING - as of 2019-07-27
 # Get SDR Play driver binaries 'API/HW driver v2.x' (not v3.x) 
@@ -15,29 +16,34 @@
 # not this: SDRplay_RSP_API-Linux-3.01.beta1.run
 # but this: SDRplay_RSP_API-Linux-2.13.1.run
 #
+# #################################
+- hosts: hamradio
   vars:
     api_distributable: "SDRplay_RSP_API-Linux-2.13.1.run"
   tasks:
-  - name: Prepare GIT dir
+  - name: verify the GIT dir
     file:
       path: "/home/shaitan/GIT" # ToDo - should really learn to use {{ variables }}
       state: directory
       owner: shaitan
       group: shaitan
+#
   - name: create SDRPlay_API directory
     file:
-      path: "/home/shaitan/GIT/SDRPlay_API" # ToDo - should really learn to use {{ variables }}
+      path: "/home/shaitan/GIT/SDRPlay_API" # ToDo - ditto.
       state: directory
       owner: shaitan
       group: shaitan
-  - name: deliver SDRPlay driver package to radio host
+#
+  - name: deliver SDRPlay driver package
     copy:
       src: "~/Ansible/Filez/{{ api_distributable }}"
       dest: "/home/shaitan/GIT/SDRPlay_API/"
       owner: shaitan
       group: shaitan
       mode: 0755
-      force: no # if there, no actual copy
+      force: no # if already there, no actual copy
+#
   - name: install SDRPlay driver
     become: true
     become_method: sudo
@@ -45,19 +51,15 @@
     expect:
       chdir: "/home/shaitan/GIT/SDRPlay_API"
       command: "/bin/bash ./{{ api_distributable }}"
+      creates: "/usr/local/lib/libmirsdrapi-rsp.so"
+#      creates: "/usr/local/include/mirsdrapi-rsp.h"
+# Todo: two "creates" clauses should be done by item.
       responses:
         'Press RETURN to view the license agreement': '\n'
         '--More--': ' '
         'the installation, or press n and RETURN to exit the installer': 'y\n'
       echo: yes
 #
-# ToDo: restart needed to give a chance to the udev rules
+# Opinion - the way how 2.3.1 asks for sudo in the middle of the script, is yackkkkkk
 #
-# Probleem - seda sitast asja ei saa teha teisiti kui käsurealt sudo parooli (ehk siis, shaitani parooli) andes.
-# Kas kirjutame selle playbook'i :) Hahaa.
-# Või ikkagi teha paroolivaba sudo?
-#
-
-
-
 ...
