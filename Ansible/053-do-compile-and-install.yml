@@ -2,7 +2,7 @@
 # ######################################################
 # Ansible playbook for a SDRPlay+OpenWebRx listening post
 # part 053 - configure, compile and install the packages
-# in a _proper_ order (there are weird dependendies) 
+# in a _proper_ order (there are weird dependendies)
 #
 # (origin and copyleft) - es1lau
 # last modified - 2019-07-28
@@ -18,160 +18,160 @@
 #
 # ######################################################
 # -- STEP 1
-  - name: provisioning 6 x build directories
-    file:
-      path: "{{ git_basedir }}/{{ item }}/build"
-      state: directory
-    with_items:
-      - 'SoapySDR'
-      - 'SoapySDRPlay'
-      - 'SoapyRemote'
-      - 'rx_tools'
-      - 'rtl-sdr'
-      - 'SoapyRTLSDR'
+    - name: provisioning 6 x build directories
+      file:
+        path: "{{ git_basedir }}/{{ item }}/build"
+        state: directory
+      with_items:
+        - 'SoapySDR'
+        - 'SoapySDRPlay'
+        - 'SoapyRemote'
+        - 'rx_tools'
+        - 'rtl-sdr'
+        - 'SoapyRTLSDR'
 
 #
 # ######################################################
 # -- STEP 2
 # SoapySDR is the first item and others are depending on it:
-  - name: cmake package -> SoapySDR (1/8)
-    command: cmake ..
-    args:
-      chdir: "{{ git_basedir }}/{{ item }}/build/"
-      creates: "{{ git_basedir }}/{{ item }}/build/CMakeCache.txt"
-    with_items:
-      - 'SoapySDR'
+    - name: cmake package -> SoapySDR (1/8)
+      command: cmake ..
+      args:
+        chdir: "{{ git_basedir }}/{{ item }}/build/"
+        creates: "{{ git_basedir }}/{{ item }}/build/CMakeCache.txt"
+      with_items:
+        - 'SoapySDR'
+#
+    - name: make package -> SoapySDR
+      command: make
+      args:
+        chdir: "{{ git_basedir }}/{{ item }}/build/"
+        creates: "{{ git_basedir }}/{{ item }}/build/apps/SoapySDRUtil"
+      with_items:
+        - 'SoapySDR'
 
-  - name: make package -> SoapySDR
-    command: make
-    args:
-      chdir: "{{ git_basedir }}/{{ item }}/build/"
-      creates: "{{ git_basedir }}/{{ item }}/build/apps/SoapySDRUtil"
-    with_items:
-      - 'SoapySDR'
+    - name: make install package -> SoapySDR
+      become: true
+      become_method: su
+      become_user: root
+      command: 'make install'
+      args:
+        chdir: "{{ git_basedir }}/{{ item }}/build/"
+        creates: "/usr/local/bin/SoapySDRUtil"
+      with_items:
+        - 'SoapySDR'
 
-  - name: make install package -> SoapySDR
-    become: true
-    become_method: su
-    become_user: root
-    command: 'make install'
-    args:
-      chdir: "{{ git_basedir }}/{{ item }}/build/"
-      creates: "/usr/local/bin/SoapySDRUtil"
-    with_items:
-      - 'SoapySDR'
-
-  - name: ldconfig
-    become: true
-    become_method: su
-    become_user: root
-    command: /usr/sbin/ldconfig
+    - name: ldconfig
+      become: true
+      become_method: su
+      become_user: root
+      command: /usr/sbin/ldconfig
 
 
 # ######################################################
 # -- STEP 3->  Next 4 items in that particular order
 
-  - name: cmake -> SoapySDRPlay, SoapyRemote, rx_tools, rtl-sdr (2-5/8)
-    command: cmake ..
-    args:
-      chdir: "{{ git_basedir }}/{{ item }}/build"
-      creates: "{{ git_basedir }}/{{ item }}/build/CMakeCache.txt"
-    with_items:
-      - 'SoapySDRPlay'
-      - 'SoapyRemote'
-      - 'rx_tools'
-      - 'rtl-sdr'
+    - name: cmake -> SoapySDRPlay, SoapyRemote, rx_tools, rtl-sdr (2-5/8)
+      command: cmake ..
+      args:
+        chdir: "{{ git_basedir }}/{{ item }}/build"
+        creates: "{{ git_basedir }}/{{ item }}/build/CMakeCache.txt"
+      with_items:
+        - 'SoapySDRPlay'
+        - 'SoapyRemote'
+        - 'rx_tools'
+        - 'rtl-sdr'
 
-  - name: make -> SoapySDRPlay, SoapyRemote, rx_tools, rtl-sdr (2-5/8)
-    command: make
-    args:
-      chdir: "{{ git_basedir }}/{{ item }}/build"
+    - name: make -> SoapySDRPlay, SoapyRemote, rx_tools, rtl-sdr (2-5/8)
+      command: make
+      args:
+        chdir: "{{ git_basedir }}/{{ item }}/build"
 #  creates is unusable with items which names differ, have to think about it.
-    with_items:
-      - 'SoapySDRPlay'
-      - 'SoapyRemote'
-      - 'rx_tools'
-      - 'rtl-sdr'
+      with_items:
+        - 'SoapySDRPlay'
+        - 'SoapyRemote'
+        - 'rx_tools'
+        - 'rtl-sdr'
 
-  - name: make install -> SoapySDRPlay, SoapyRemote, rx_tools, rtl-sdr (2-5/8)
-    become: true
-    become_method: su
-    become_user: root
-    command: make install
-    args:
-      chdir: "{{ git_basedir }}/{{ item }}/build"
+    - name: make install -> SoapySDRPlay, SoapyRemote, rx_tools, rtl-sdr (2-5/8)
+      become: true
+      become_method: su
+      become_user: root
+      command: make install
+      args:
+        chdir: "{{ git_basedir }}/{{ item }}/build"
 #  creates is unusable with items and names that differ from the package name
-    with_items:
-      - 'SoapySDRPlay'
-      - 'SoapyRemote'
-      - 'rx_tools'
-      - 'rtl-sdr'
+      with_items:
+        - 'SoapySDRPlay'
+        - 'SoapyRemote'
+        - 'rx_tools'
+        - 'rtl-sdr'
 
-  - name: ldconfig
-    become: true
-    become_method: su
-    become_user: root
-    command: /usr/sbin/ldconfig
+    - name: ldconfig
+      become: true
+      become_method: su
+      become_user: root
+      command: /usr/sbin/ldconfig
 
 # Need to separate four to 2+2
 # because only first two have names matching item name
 # and can be checked with "creates" in /usr/local/bin
-# 
+#
 # ######################################################
 # -- STEP 4 -> SoapyRTLSDR that needs targets 1 & 5 already being installed
 
-  - name: cmake -> SoapyRTLSDR (6/8)
-    command: cmake ..
-    args:
-      chdir: "{{ git_basedir }}/{{ item }}/build"
-      creates: "{{ git_basedir }}/{{ item }}/build/CMakeCache.txt"
-    with_items:
-      - 'SoapyRTLSDR'
+    - name: cmake -> SoapyRTLSDR (6/8)
+      command: cmake ..
+      args:
+        chdir: "{{ git_basedir }}/{{ item }}/build"
+        creates: "{{ git_basedir }}/{{ item }}/build/CMakeCache.txt"
+      with_items:
+        - 'SoapyRTLSDR'
 
-  - name: make -> SoapyRTLSDR (6/8)
-    command: make
-    args:
-      chdir: "{{ git_basedir }}/{{ item }}/build"
+    - name: make -> SoapyRTLSDR (6/8)
+      command: make
+      args:
+        chdir: "{{ git_basedir }}/{{ item }}/build"
 #      creates: "{{ git_basedir }}/{{ item }}/build/apps/SoapySDRUtil"
-    with_items:
-      - 'SoapyRTLSDR'
+      with_items:
+        - 'SoapyRTLSDR'
 
-  - name: make install -> SoapyRTLSDR (6/8)
-    become: true
-    become_method: su
-    become_user: root
-    command: make install
-    args:
-      chdir: "{{ git_basedir }}/{{ item }}/build"
+    - name: make install -> SoapyRTLSDR (6/8)
+      become: true
+      become_method: su
+      become_user: root
+      command: make install
+      args:
+        chdir: "{{ git_basedir }}/{{ item }}/build"
 #      creates: "/usr/local/bin/SoapySDRUtil"
-    with_items:
-      - 'SoapyRTLSDR'
+      with_items:
+        - 'SoapyRTLSDR'
 
-  - name: ldconfig
-    become: true
-    become_method: su
-    become_user: root
-    command: /usr/sbin/ldconfig
+    - name: ldconfig
+      become: true
+      become_method: su
+      become_user: root
+      command: /usr/sbin/ldconfig
 
 # ######################################################
 # -- STEP 5 -> csdr seem to have no dependancies
 
-  - name: make install -> csdr (7/8)
-    become: true
-    become_method: su
-    become_user: root
-    command: make install
-    args:
-      chdir: "{{ git_basedir }}/{{ item }}"
-      creates: "/usr/bin/{{ item }}"
-    with_items:
-      - 'csdr'
+    - name: make install -> csdr (7/8)
+      become: true
+      become_method: su
+      become_user: root
+      command: make install
+      args:
+        chdir: "{{ git_basedir }}/{{ item }}"
+        creates: "/usr/bin/{{ item }}"
+      with_items:
+        - 'csdr'
 
-  - name: ldconfig
-    become: true
-    become_method: su
-    become_user: root
-    command: /usr/sbin/ldconfig
+    - name: ldconfig
+      become: true
+      become_method: su
+      become_user: root
+      command: /usr/sbin/ldconfig
 
 # For many reasons, it is reasonable to deal with OpenWebRX separately
 ...

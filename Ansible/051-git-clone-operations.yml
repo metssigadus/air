@@ -60,6 +60,6 @@
       repo: 'https://github.com/simonyiszk/openwebrx.git'
       dest: "{{ git_basedir }}/OpenWebRX"
       clone: yes
-3
+
 # we do it sequentially without items so that errors are clearly visible
 ...
