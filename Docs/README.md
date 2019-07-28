@@ -1,4 +1,4 @@
-===== Five W's
+#### Five W's
 This naive set of Ansible playbooks is intended to get up and running an SDRPlay listening post of certain configuration.
 Installation scripts are for a of SoapyRemote capable OpenWebRX machine.
 I just documented my own installation with the better recovery and resilience in mind (too much knowledge to remember, too long notes to keep)
@@ -32,7 +32,7 @@ There are two important dependencies kept as locally as warez files and reused o
 
 =====================
 
-==== The basic workflow:
+#### The basic workflow:
 
 a) install a fresh Debian (netinstall).
   - when taskselect: no desktop env, no print srv. Just ssh server plus standard system utilities.
@@ -47,7 +47,7 @@ d) as a deploy user, use ansible to install the further software. There are some
   - Vendor API installation script insists on sudo (at least v 2.13.1).
   - manually fiddling with the ansible.conf might be needed for this (sudo vs su)
 
-==== Where I spent most of the time:
+#### Where I spent most of the time:
 
   - not understanding the *.yaml files syntax is positional (like with Python code). One extra space in the end of a line and you are lost. One space missing in front of "- name" and you are lost once again. Better install and use yamllint.
   - differences btw various Ansible versions(path/dest, reboot). You will loose your time b/c certain nice stackexchanged syntaxes just don't work as they once did (b/c Ansible has evolved much).
@@ -56,14 +56,14 @@ d) as a deploy user, use ansible to install the further software. There are some
   - It is now over a year while SDRPlay vendor is not helping the pothosware developers to make a transit to their 3.0.1 version of API. That results git cloning and then compiling SoapySDRPlay will fail without meaningful comments. But the secret is simple: keep using the old 2.3.1 version of the SDRPlay API.
   - the order you compile and install the software is important. Next items need the previous items installed
 
-==== Other possible difficulties?
+#### Other possible difficulties?
 
   - Get yr HW working (antennas, cables, etc)
   - Work through the Ansible idiosyncrasies. It wasn't a human who created this ... possibily an alien or sysadmin.
   - Linux admin qualifications would be useful - if smth goes not according to playbook, you have to debug it out.
   - Security of the internet connected machine will certainly need some serious trimming and there is no single and simple guide for the purpose.
 
-==== USB Resurrection
+#### USB Resurrection
 
 Warning - USB devices sometimes manage to remain alive after a cold restart.
 Why? Due to ATX “+5 V standby” which some of the USB connectors tend to use.
