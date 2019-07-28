@@ -1,24 +1,28 @@
 ---
+# #######################################################
 # Ansible playbook for a SDRPlay+OpenWebRx listening post
-# part 05 - Manipulate the git directory
+# part 041 - Back up the old git directory, if any
 #
 # (origin and copyleft) - es1lau
-# last modified - 2019-07-27
-# version? probably 0.7 or something
+# last modified - 2019-07-28
+# version? likely around 0.7
+# #######################################################
 #
 - hosts: hamradio
   vars:
-    git_basedir: "/home/shaitan/GIT"
+    executing_user: shaitan
+    git_basedir: "/home/{{ executing_user }}/GIT"
   tasks:
   - stat:
       path: "{{ git_basedir }}"
     register: git_dir
+#
   - name: Back up the old git dir
     command: mv "{{ git_basedir }}" "{{ git_basedir }}-BACK-{{ ansible_date_time.iso8601 }}"
     when: git_dir.stat.exists
+#
   - name: Create a new directory for the git
     file:
       path: "{{ git_basedir }}" # 
       state: directory
 ...
-
