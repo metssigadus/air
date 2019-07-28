@@ -4,8 +4,8 @@
 # but maintain it in a local directory for conveniency
 #
 # (origin and copyleft) - es1lau
-# last modified - 2019-07-27
-# version? probably 0.7 or something
+# last modified - 2019-07-28
+# version? likely around 0.7
 #
 # throw away /etc/ansible/hosts
 # throw away /etc/ansible/ansible.config
@@ -21,6 +21,7 @@ air1
 air3
 test
 
+# syntax examples
 # [air1:vars]
 # ansible_user = shaitan  # ssh login user
 # become = yes
@@ -32,6 +33,7 @@ test
 10.10.117.117
 
 
+# syntax examples
 # [air3:vars]
 # ansible_user = shaitan  # ssh login user
 # become_user = root
@@ -43,9 +45,15 @@ test
 [air3]
 10.10.119.119
 
+
 [test]
 10.10.177.177
 
 # And not, these IP's are not real.
 # Change these to your own name/IP pairs
 # Only the structure is what is worth to look at.
+
+# This section is needed to give local commands straight from Ansible
+[ansiblehost]
+127.0.0.1
+
