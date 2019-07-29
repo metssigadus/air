@@ -8,8 +8,6 @@
 # version? likely around 0.7
 # ########################################################
 #
-#   -- WARNING - not tested yet!!!!!
-#
 - hosts: air1
   tasks:
 
@@ -19,8 +17,9 @@
       become_user: root
       command: 'rtl_test -t'
       register: rtls_found_locally
+      ignore_errors: true
 #
-   - debug: msg="{{ rtls_found_locally }}"
+    - debug: msg="{{ rtls_found_locally.stdout }}"
 
     - name: enumerate SDRs connected to the radio host
       become: yes
@@ -28,7 +27,8 @@
       become_user: root
       command: 'SoapySDRUtil --find'
       register: soapys_found_locally
+      ignore_errors: true
 #
-   - debug: msg="{{ soapys_found_locally }}"
+    - debug: msg="{{ soapys_found_locally.stdout }}"
 ...
 
