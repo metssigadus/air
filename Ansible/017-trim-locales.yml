@@ -1,0 +1,59 @@
+---
+# ##################################################################
+# Ansible playbook for a SDRPlay+OpenWebRx listening post
+# part 017 - trim locales (we'll see whether we need this)
+#
+# (origin and copyleft) - es1lau
+# last modified - 2019-07-30
+# version? likely around 0.7
+# ##################################################################
+#
+# This playbook technically works but is it really useful?
+#
+- hosts: hamradio
+  vars:
+    locales_filename: "/etc/locale.gen"
+  become: yes
+  become_method: su
+  become_user: root
+  tasks:
+
+    - name: mark en_US.UTF-8
+      lineinfile:
+        dest: "{{ locales_filename }}"
+        regexp: '^# en_US.UTF-8'
+        line: 'en_US.UTF-8'
+        state: present
+
+    - name: mark et_EE.UTF-8 UTF-8
+      lineinfile:
+        dest: "{{ locales_filename }}"
+        regexp: '^# et_EE.UTF-8 UTF-8'
+        line: 'et_EE.UTF-8 UTF-8'
+        state: present
+
+    - name: mark ru_RU.UTF-8 UTF-8
+      lineinfile:
+        dest: "{{ locales_filename }}"
+        regexp: '^# ru_RU.UTF-8 UTF-8'
+        line: 'ru_RU.UTF-8 UTF-8'
+        state: present
+
+    - name: generate the locales
+      command: "/usr/sbin/locale-gen"
+
+    - name: Look what we have available
+      command: "/usr/bin/localectl list-locales"
+      register: list_of_locales
+
+    - debug: msg="{{ list_of_locales.stdout }}"
+
+
+    - name: Look at our particular setup
+      command: "/usr/bin/localectl status"
+      register: status_of_locales
+#
+    - debug: msg="{{ status_of_locales.stdout }}"
+#
+# further information: https://www.tecmint.com/set-system-locales-in-linux/
+...
