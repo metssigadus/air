@@ -8,7 +8,8 @@
 # version? likely around 0.7
 # #####################################################
 #
-
+# Did you notice - a LOCAL SUDO passwd was being asked?!
+#
 - hosts: local
   connection: local
   become: yes

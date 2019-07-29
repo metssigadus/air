@@ -13,27 +13,31 @@
 # thus config variants are to be exchanged before and after
 #   - yeah, a great sin - a self-modifying instruction
 #   - _maybe_ I shall learn to use lineinfile feature later
+#
+# Did you notice - the LOCAL ADMIN password is being asked for
+#   which means: Ansible says "su" but means "sudo" and does that
+#
 # #########################################################
 # Todo - variables
 #
 - hosts: local
   connection: local
   become: yes
-  become_method: su
+  become_method: sudo
   become_user: root
   tasks:
-    - name: verify the value of become_method before changing it
-      command: grep become_method /home/n0ne/Ansible/ansible.cfg
-      register: become_variant
+   - name: verify the value of become_method before changing it
+     command: grep become_method /home/n0ne/Ansible/ansible.cfg
+     register: become_variant
 #
-    - debug: msg="{{ become_variant.stdout }} "
+   - debug: msg="{{ become_variant.stdout }} "
 #
-    - name: Substitute the global become_method from su to sudo
-      shell: sed -i "s/^become_method = su/become_method = sudo/g" /home/n0ne/Ansible/ansible.cfg
+   - name: Substitute the global become_method from su to sudo
+     shell: sed -i "s/^become_method = su/become_method = sudo/g" /home/n0ne/Ansible/ansible.cfg
 #
-    - name: verify what we just did
-      command: grep become_method /home/n0ne/Ansible/ansible.cfg
-      register: become_variant
+   - name: verify what we just did
+     command: grep become_method /home/n0ne/Ansible/ansible.cfg
+     register: become_variant
 #
-    - debug: msg="{{ become_variant.stdout }} "
+   - debug: msg="{{ become_variant.stdout }} "
 ...

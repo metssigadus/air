@@ -1,8 +1,4 @@
 ---
-#
-#    This is an absolute DRAFT and is not TESTED yet.
-#    So far: do these operations manually!
-#
 # ###########################################################
 # Ansible playbook for a SDRPlay+OpenWebRx listening post
 # part 055 - add some extra rules for udev
@@ -36,30 +32,24 @@
   become_user: root
   vars:
     sdrplay_filename: "/etc/udev/rules.d/66-mirics.rules"
-    rtlsdr_filename: "/etc/udev/rules.d/67.rtlsdr.rules" # order
+    rtlsdr_filename: "/etc/udev/rules.d/67-rtlsdr.rules" # order
     soapy_sysctl_filename: "/etc/sysctl.d/10-SoapyRemote.conf"
     mem_max_value: "104857600" # a certain sysctl value for radio host
-    security_limits_filename: "/etc/security/limits.conf "
+    security_limits_filename: "/etc/security/limits.conf"
   tasks:
 
 # ------ STEP 1 - fiddling with SDRPlay udev rules syntax
 #
     - name: verify the value of 66-mirics.rules before changing it
-      command: cat {{ sdrplay_filename }} | grep 3000
+      command: "grep 3000 {{ sdrplay_filename }}"
       register: udev_excerpt_3000
 #
     - debug: msg="{{ udev_excerpt_3000.stdout }}"
 #
-    - name: edit spaces into 66-mirics.rules
-      shell: "{{ item }} {{ sdrplay_filename }}"
-      with_items:
-        - item: 'sed -i "s/,E/, E/g"'
-        - item: 'sed -i "s/,A/, A/g"'
-        - item: 'sed -i "s/,M/, M/g"'
-        - item: 'sed -i "s/MODE:=\"0666\"/MODE:=\"0666\", SYMLINK\+=\"sdrplay\"/g'
-#
+#  ######### Actual editing omitted while learning fileinline #####
+
     - name: verify the 66-mirics.rules after editing
-      command: cat  {{ sdrplay_filename }} | grep 3000
+      command: "grep 3000 {{ sdrplay_filename }}"
       register: udev_excerpt
 #
     - debug: msg="{{ udev_excerpt.stdout }} "
@@ -74,25 +64,44 @@
         dest: "{{ rtlsdr_filename }}"
         line: 'SUBSYSTEM=="usb", ATTRS{idVendor}=="0bda", ATTRS{idProduct}=="2838", GROUP="air", MODE="0666", SYMLINK+="rtl_sdr"'
         create: yes
+        state: present
 #
 # ------- STEP 3
+#
+# Have to do it with_items but no suxxess so far
+# "ERROR! 'item_dest' is undefined"
 #
     - name: create a suitable Soapy sysctl file
       lineinfile:
         owner: root
         group: root
         mode: '0644'
-        dest: "{{ item.dest }}"
-        line: "{{ item.line }}"
+        dest: "{{ soapy_sysctl_filename }}"
+        line: "# {{ ansible_date_time.iso8601 }} added by Ansible for pothosware SoapyRemote"
         create: yes
-      with_items:
-        - item: {dest: '{{ soapy_sysctl_filename }}', line: '# {{ ansible_date_time.iso8601 }} added by Ansible for pothosware SoapyRemote'}
-        - item: {dest: '{{ soapy_sysctl_filename }}', line: '# '}
-        - item: {dest: '{{ soapy_sysctl_filename }}', line: 'net.core.rmem_max = {{ mem_max_value }} '}
-        - item: {dest: '{{ soapy_sysctl_filename }}', line: 'net.core.wmem_max = {{ mem_max_value }} '}
+        state: present
+# Haha - repeated launches will create repeated comments ... at least not dangerous
+
+    - name: add line 2 to Soapy sysctl file
+      lineinfile:
+        dest: "{{ soapy_sysctl_filename }}"
+        line: "# "
+        state: present
+
+    - name: add line 3 to Soapy sysctl file
+      lineinfile:
+        dest: "{{ soapy_sysctl_filename }}"
+        line: "net.core.rmem_max = {{ mem_max_value }} "
+        state: present
+
+    - name: add line 4 to Soapy sysctl file
+      lineinfile:
+        dest: "{{ soapy_sysctl_filename }}"
+        line: "net.core.wmem_max = {{ mem_max_value }} "
+        state: present
 #
     - name: verify the sysctl amendments after editing
-      command: cat  {{ soapy_sysctl_filename }} | grep "net.code*mem_max"
+      command: 'cat  {{ soapy_sysctl_filename }}'
       register: sysctl_excerpt
 #
     - debug: msg="{{ sysctl_excerpt.stdout }}"
@@ -105,16 +114,20 @@
         owner: root
         group: root
         mode: '0644'
-        dest: "{{ item.dest }}"
-        line: "{{ item.line }}"
+        dest: "{{ security_limits_filename }}"
+        line: '# 2018-06-04 by Ansible for pothosware SoapyRemote'
         create: yes
-      with_items:
-        - item: {dest: '{{ security_limits_filename }}', line: '# 2018-06-04 by Ansible for pothosware SoapyRemote'}
-        - item: {dest: '{{ security_limits_filename }}', line: 'air hard rtprio 99'}
+        state: present
 
-#
+    - name: add line 2 to limits conf
+      lineinfile:
+        dest: "{{ security_limits_filename }}"
+        line: 'air hard rtprio 99'
+        create: yes
+        state: present
+
     - name: verify the sysctl amendments after editing
-      command: cat  {{ security_limits_filename }} | grep "air "
+      command: "grep air {{ security_limits_filename }}"
       register: limits_excerpt
     - debug: msg="{{ limits_excerpt.stdout }}"
 

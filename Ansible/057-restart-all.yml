@@ -8,30 +8,24 @@
 # version? likely around 0.7
 # ########################################################
 #
-#   -- WARNING - not tested yet!!!!!
-#
 - hosts: air1
   tasks:
     - name: Queue a reboot that starts in +1 min
       become: yes
       become_method: su
       become_user: root
-      command: 'shutdown -r +1'
+      command: "/sbin/shutdown --reboot +1"
+      async: 0 # must be 0 not 1 or weird problems
+      poll: 0
+      ignore_errors: true
 #
     - name: Wait 120 secs before confirming the rebirth
       pause:
         minutes: 2
 #
-    - name: Checking the server is alive again
-      local_action: wait_for
-        host="air1"
-        port=22
-        delay=10
-        timeout=120
-#
     - name: See it with own eyes
       command: 'uptime'
-      register: up_time
+      register: time_up
 #
-    - debug: msg="{{ up_time }}"
+    - debug: msg="{{ time_up.stdout }}"
 ...

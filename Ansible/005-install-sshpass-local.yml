@@ -9,6 +9,7 @@
 # ############################################
 #
 # command line to launch --> ansible-playbook 005-install-sshpass-local.yml
+# a note - very obviously, a LOCAL sudo passwd is to be asked for...
 #
 - hosts: local
   connection: local
