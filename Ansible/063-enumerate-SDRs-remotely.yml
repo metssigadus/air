@@ -8,18 +8,43 @@
 # version? likely around 0.7
 # ########################################################
 #
-#   -- WARNING - not tested yet!!!!!
-#   .. NB! There were some prerequisites in addition to avahi
+# NB! an IP based request keeps in cache some time (1min?).
+# This while the driver based requests are possible.
 #
 - hosts: air3
+  vars:
+    air1_ip: "10.10.117.117"
   tasks:
-    - name: enumerate SDRs visible via Soapy channel
+    - name: enumerate SDRPlays accessible via Soapy channel
       become: yes
       become_method: su
       become_user: root
-      command: 'SoapySDRUtil --find'
-      register: soapys_found_remotely
+      command: 'SoapySDRUtil --find="remote={{ air1_ip }}"'
+      register: ip_questioned_remotely
+      ignore_errors: true
 #
-   - debug: msg="{{ soapys_found_remotely }}"
-...
+    - debug: msg="{{ ip_questioned_remotely.stdout_lines }}"
+#
+    - name: sleep 8 sec while the cache populates
+      command: 'sleep 8'
 
+    - name: enumerate SDRPlays accessible via Soapy channel
+      become: yes
+      become_method: su
+      become_user: root
+      command: 'SoapySDRUtil --find="remote:driver = sdrplay"'
+      register: soapys_found_remotely
+      ignore_errors: true
+#
+    - debug: msg="{{ soapys_found_remotely.stdout_lines }}"
+#
+    - name: enumerate RTL-SDRs accessible via Soapy channel
+      become: yes
+      become_method: su
+      become_user: root
+      command: 'SoapySDRUtil --find="remote:driver = rtlsdr"'
+      register: rtls_found_remotely
+      ignore_errors: true
+#
+    - debug: msg="{{ rtls_found_remotely.stdout_lines }}"
+...

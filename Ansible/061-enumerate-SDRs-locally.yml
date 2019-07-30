@@ -4,31 +4,43 @@
 # part 061 - enumerate connected SDRs "locally" (at air1)
 #
 # (origin and copyleft) - es1lau
-# last modified - 2019-07-29
+# last modified - 2019-07-30
 # version? likely around 0.7
 # ########################################################
 #
 - hosts: air1
   tasks:
+    - name: Check whether the Soapy Server works
+      shell: "/bin/journalctl --no-pager -u SoapySDRServer | head -20"
+      register: shell_output
+#
+    - debug: msg="{{ shell_output.stdout_lines }}" # stdout_ines to ensure readability
+#
 
-    - name: A modest task to enumerate RTL-SDR via rtl_test
+    - name: See a detailed probe
       become: yes
       become_method: su
       become_user: root
-      command: 'rtl_test -t'
-      register: rtls_found_locally
+      command: 'SoapySDRUtil --probe'
+      register: probe_locally
       ignore_errors: true
 #
-    - debug: msg="{{ rtls_found_locally.stdout }}"
+    - debug: msg="{{ probe_locally.stdout_lines }}" # ditto
 
-    - name: enumerate SDRs connected to the radio host
-      become: yes
-      become_method: su
-      become_user: root
+    - name: enumerate SDRs connected to the radio host (locally and remotely)
       command: 'SoapySDRUtil --find'
       register: soapys_found_locally
       ignore_errors: true
 #
-    - debug: msg="{{ soapys_found_locally.stdout }}"
+    - debug: msg="{{ soapys_found_locally.stdout_lines }}" # ditto
+
+    - name: enumerate SDRs sparsely
+      command: 'SoapySDRUtil --find --sparse'
+      register: soapys_found_locally
+      ignore_errors: true
+#
+    - debug: msg="{{ soapys_found_locally.stdout_lines }}" # ditto
+
+# ToDo systemd action and creates.
 ...
 
