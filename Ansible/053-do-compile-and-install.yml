@@ -5,9 +5,11 @@
 # in a _proper_ order (there are weird dependendies) 
 #
 # (origin and copyleft) - es1lau
-# last modified - 2019-07-28
+# last modified - 2019-07-31
 # version? probably 0.7 or something
 # ######################################################
+#
+# better ldconfig without full path. Has changed from Debian 8 to 10
 #
 - hosts: hamradio
   vars:
@@ -63,7 +65,7 @@
     become: true
     become_method: su
     become_user: root
-    command: /usr/sbin/ldconfig
+    command: ldconfig
 
 
 # ######################################################
@@ -109,7 +111,7 @@
     become: true
     become_method: su
     become_user: root
-    command: /usr/sbin/ldconfig
+    command: ldconfig
 
 # Need to separate four to 2+2
 # because only first two have names matching item name
@@ -149,7 +151,7 @@
     become: true
     become_method: su
     become_user: root
-    command: /usr/sbin/ldconfig
+    command: ldconfig
 
 # ######################################################
 # -- STEP 5 -> csdr seem to have no dependancies
@@ -169,7 +171,7 @@
     become: true
     become_method: su
     become_user: root
-    command: /usr/sbin/ldconfig
+    command: ldconfig
 
 # For many reasons, it is reasonable to deal with OpenWebRX separately
 ...
